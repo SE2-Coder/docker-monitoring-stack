@@ -2,8 +2,3 @@ FROM prom/prometheus:v2.53.0
 
 # Copy custom configuration
 COPY prometheus.yaml /etc/prometheus/prometheus.yaml
-
-# Ensure correct permissions
-USER root
-RUN chown nobody:nogroup /etc/prometheus/prometheus.yaml
-USER nobody
