@@ -1,0 +1,9 @@
+FROM prom/prometheus:v2.53.0
+
+# Copiar la configuración personalizada
+COPY prometheus.yml /etc/prometheus/prometheus.yml
+
+# Asegurar permisos correctos
+USER root
+RUN chown nobody:nogroup /etc/prometheus/prometheus.yml
+USER nobody
