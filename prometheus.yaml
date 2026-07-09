@@ -3,14 +3,63 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
+  # ==========================================
+  # MONITOREO LOCAL (El servidor donde vive Grafana)
+  # ==========================================
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'node-exporter'
+  - job_name: 'node-exporter-local'
     static_configs:
       - targets: ['node-exporter:9100']
+        labels:
+          server: 'servidor-grafana'
 
-  - job_name: 'cadvisor'
+  - job_name: 'cadvisor-local'
     static_configs:
       - targets: ['cadvisor:8080']
+        labels:
+          server: 'servidor-grafana'
+
+  # ==========================================
+  # STACK WORDPRESS (Cliente/Sitio 1)
+  # ==========================================
+  # HOY (Local): Usamos el nombre del contenedor que definiste en el docker-compose de WP.
+  # MAÑANA (Producción): Cambiamos esto por la IP de Tailscale del cliente (ej: 100.x.x.1)
+  
+  - job_name: 'site-1-mariadb'
+    scrape_interval: 30s
+    static_configs:
+      # HOY:           targets: ['midominio-test.com-mariadb-exporter:9104']
+      # PRODUCCIÓN:    targets: ['100.x.x.1:9104']
+      - targets: ['midominio-test.com-mariadb-exporter:9104'] 
+        labels:
+          server: 'cliente-1'
+          site: 'midominio-test.com'
+
+  - job_name: 'site-1-nginx'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['midominio-test.com-nginx-exporter:9113']
+        labels:
+          server: 'cliente-1'
+          site: 'midominio-test.com'
+
+  - job_name: 'site-1-redis'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['midominio-test.com-redis-exporter:9121']
+        labels:
+          server: 'cliente-1'
+          site: 'midominio-test.com'
+
+  - job_name: 'site-1-php-fpm'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ['midominio-test.com-php-fpm-exporter:9253']
+        labels:
+          server: 'cliente-1'
+          site: 'midominio-test.com'
+
+  # --- Para agregar el SITIO 2, solo copias este bloque y cambias el nombre del contenedor/IP ---
