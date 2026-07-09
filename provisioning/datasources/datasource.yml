@@ -1,13 +1,11 @@
 apiVersion: 1
 
-# Borra datasources por defecto de Grafana
 deleteDatasources: []
 
 datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    # Como están en la misma red Docker (monitoring_net), usamos el nombre del contenedor
     url: http://prometheus:9090
     isDefault: true
     editable: false
