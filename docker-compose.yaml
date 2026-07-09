@@ -3,7 +3,7 @@ version: "3.9"
 services:
   prometheus:
     image: prom/prometheus:v2.54.1
-    container_name: prometheus # ESTE SE QUEDA
+    container_name: prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yaml'
       - '--storage.tsdb.path=/prometheus'
@@ -24,7 +24,7 @@ services:
 
   grafana:
     image: grafana/grafana:11.1.0
-    container_name: grafana # ESTE SE QUEDA
+    container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana
       - ./provisioning:/etc/grafana/provisioning:ro
@@ -44,7 +44,6 @@ services:
 
   node-exporter:
     image: prom/node-exporter:v1.8.1
-    # ELIMINADO: container_name: node-exporter
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -57,10 +56,15 @@ services:
     restart: unless-stopped
     networks:
       - monitoring_net
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9100/metrics" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
-    # ELIMINADO: container_name: cadvisor
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -70,6 +74,12 @@ services:
     restart: unless-stopped
     networks:
       - monitoring_net
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/healthz" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 networks:
   monitoring_net:
